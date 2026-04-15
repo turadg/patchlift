@@ -2,36 +2,48 @@
   "name": "patchlift",
   "version": "0.1.0",
   "description": "Lift your local Yarn patches upstream",
-  "main": "dist/index.js",
-  "scripts": {
-    "build": "tsc",
-    "dev": "tsx src/index.ts",
-    "test": "vitest run",
-    "lint": "tsc --noEmit"
+  "keywords": [],
+  "homepage": "https://github.com/turadg/patchlift#readme",
+  "bugs": {
+    "url": "https://github.com/turadg/patchlift/issues"
   },
+  "license": "MIT",
+  "author": "",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/turadg/patchlift.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
-  "bugs": {
-    "url": "https://github.com/turadg/patchlift/issues"
+  "bin": {
+    "patchlift": "dist/index.mjs"
   },
-  "homepage": "https://github.com/turadg/patchlift#readme",
-  "devDependencies": {
-    "@types/node": "^25.6.0",
-    "tsx": "^4.21.0",
-    "typescript": "^6.0.2",
-    "vitest": "^4.1.4"
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "dist/index.mjs",
+  "types": "dist/index.d.mts",
+  "scripts": {
+    "build": "vp pack",
+    "dev": "tsx src/index.ts",
+    "test": "vp test run",
+    "lint": "tsc --noEmit",
+    "prepare": "vp config",
+    "prepublishOnly": "pnpm run lint && pnpm run test && pnpm run build"
   },
   "dependencies": {
     "commander": "^14.0.3",
     "open": "^11.0.0"
   },
-  "bin": {
-    "patchlift": "dist/index.js"
-  }
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2",
+    "vite-plus": "latest",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+  },
+  "packageManager": "pnpm@10.33.0"
 }
