@@ -2,6 +2,7 @@
 import { Command, Option } from "commander";
 import { issueCommand } from "./commands/issue.js";
 import { inspectCommand } from "./commands/inspect.js";
+import { triageCommand } from "./commands/triage.js";
 import { updateCommand } from "./commands/update.js";
 import { STATUSES } from "./core/sidecar.js";
 
@@ -47,6 +48,18 @@ program
   .action(async (patchFile: string | undefined, options: { json: boolean; verbose: boolean }) => {
     try {
       await inspectCommand(patchFile, options);
+    } catch (err) {
+      console.error(`Error: ${(err as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+program
+  .command("triage")
+  .description("Interactively classify untracked patches")
+  .action(async () => {
+    try {
+      await triageCommand();
     } catch (err) {
       console.error(`Error: ${(err as Error).message}`);
       process.exit(1);
