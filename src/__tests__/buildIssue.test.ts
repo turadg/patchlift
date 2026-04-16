@@ -33,10 +33,10 @@ describe("buildIssue", () => {
     expect(issue.title).toBe("My Custom Title");
   });
 
-  it("includes package info in body", () => {
+  it("includes package info and patchlift attribution in body", () => {
     const issue = buildIssue(patchInfo, packageInfo, repoInfo);
     expect(issue.body).toContain("lodash@4.17.21");
-    expect(issue.body).toContain("lodash/lodash");
+    expect(issue.body).toContain("patchlift");
   });
 
   it("includes summary when provided", () => {
@@ -44,8 +44,14 @@ describe("buildIssue", () => {
     expect(issue.body).toContain("My summary");
   });
 
-  it("includes changed files", () => {
+  it("uses placeholder block when no summary provided", () => {
     const issue = buildIssue(patchInfo, packageInfo, repoInfo);
-    expect(issue.body).toContain("src/index.js");
+    expect(issue.body).toContain("PLEASE REPLACE THIS BLOCK");
+  });
+
+  it("embeds the diff in a fenced block", () => {
+    const issue = buildIssue(patchInfo, packageInfo, repoInfo);
+    expect(issue.body).toContain("```diff");
+    expect(issue.body).toContain(patchInfo.rawContent.trim());
   });
 });
