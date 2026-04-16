@@ -42,7 +42,7 @@ function extractBaseVersion(decodedValue: string): string | null {
 }
 
 function extractPatchChain(decodedValue: string): string[] {
-  const re = /\.yarn\/patches\/([^#:?\s]+\.patch)/g;
+  const re = /(?:\.yarn\/patches|patches)\/([^#:?\s]+\.patch)/g;
   const result: string[] = [];
   let m: RegExpExecArray | null;
   while ((m = re.exec(decodedValue)) !== null) result.push(m[1]);
@@ -72,7 +72,12 @@ export async function loadResolutions(startDir: string): Promise<Record<string, 
 export function buildChainMap(resolutions: Record<string, string>): Map<string, ChainEntry> {
   const map = new Map<string, ChainEntry>();
   for (const [key, value] of Object.entries(resolutions)) {
-    if (typeof value !== "string" || !value.includes(".yarn/patches/")) continue;
+    if (
+      typeof value !== "string" ||
+      (!value.includes(".yarn/patches/") && !value.includes("patches/"))
+    ) {
+      continue;
+    }
 
     const decoded = decodeFully(value);
     const chain = extractPatchChain(decoded);
