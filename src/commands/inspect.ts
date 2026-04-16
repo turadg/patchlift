@@ -3,6 +3,8 @@ import { join, basename, dirname } from "node:path";
 import { existsSync } from "node:fs";
 import { inferPackage } from "../core/inferPackage.js";
 import { readSidecar, resolveSidecarStatus } from "../core/sidecar.js";
+import { resolvePatchPath } from "../core/resolvePatchPath.js";
+import { hashPatch } from "../core/hashPatch.js";
 
 interface InspectOptions {
   json: boolean;
@@ -164,15 +166,14 @@ export async function inspectCommand(
   options: InspectOptions,
 ): Promise<void> {
   const patches: PatchSummary[] = [];
-  const searchStart = patchFile ? dirname(patchFile) : process.cwd();
+
+  const resolvedPatch = patchFile ? resolvePatchPath(patchFile) : undefined;
+  const searchStart = resolvedPatch ? dirname(resolvedPatch) : process.cwd();
   const resolutions = await loadResolutions(searchStart);
   const chainMap = buildChainMap(resolutions);
 
-  if (patchFile) {
-    if (!existsSync(patchFile)) {
-      throw new Error(`Patch file not found: ${patchFile}`);
-    }
-    patches.push(await inspectPatch(patchFile, chainMap));
+  if (resolvedPatch) {
+    patches.push(await inspectPatch(resolvedPatch, chainMap));
   } else {
     // Scan .yarn/patches
     const patchDir = join(process.cwd(), ".yarn", "patches");

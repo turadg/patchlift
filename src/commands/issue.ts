@@ -1,12 +1,12 @@
-import { readFile } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
-import { parsePatch } from '../core/parsePatch.js';
-import { inferPackage } from '../core/inferPackage.js';
-import { resolveRepo } from '../core/resolveRepo.js';
-import { hashPatch } from '../core/hashPatch.js';
-import { readSidecar, writeSidecar } from '../core/sidecar.js';
-import { buildIssue } from '../core/buildIssue.js';
-import type { SidecarData } from '../core/sidecar.js';
+import { readFile } from "node:fs/promises";
+import { parsePatch } from "../core/parsePatch.js";
+import { inferPackage } from "../core/inferPackage.js";
+import { resolveRepo } from "../core/resolveRepo.js";
+import { hashPatch } from "../core/hashPatch.js";
+import { readSidecar, writeSidecar } from "../core/sidecar.js";
+import { buildIssue } from "../core/buildIssue.js";
+import { resolvePatchPath } from "../core/resolvePatchPath.js";
+import type { SidecarData } from "../core/sidecar.js";
 
 interface IssueOptions {
   title?: string;
@@ -18,11 +18,9 @@ interface IssueOptions {
 }
 
 export async function issueCommand(patchFile: string, options: IssueOptions): Promise<void> {
-  if (!existsSync(patchFile)) {
-    throw new Error(`Patch file not found: ${patchFile}`);
-  }
+  patchFile = resolvePatchPath(patchFile);
 
-  const content = await readFile(patchFile, 'utf-8');
+  const content = await readFile(patchFile, "utf-8");
   const patchInfo = parsePatch(content);
   const packageInfo = inferPackage(patchFile);
   const repoInfo = await resolveRepo(packageInfo.name);
@@ -51,7 +49,7 @@ export async function issueCommand(patchFile: string, options: IssueOptions): Pr
         issue: options.issue ?? existing?.upstream?.issue ?? null,
         pr: existing?.upstream?.pr ?? null,
       },
-      status: options.issue ? 'proposed' : (existing?.status ?? 'untracked'),
+      status: options.issue ? "proposed" : (existing?.status ?? "untracked"),
       notes: existing?.notes ?? null,
       createdAt: existing?.createdAt ?? now,
       updatedAt: now,
@@ -64,7 +62,7 @@ export async function issueCommand(patchFile: string, options: IssueOptions): Pr
   if (options.web && !options.dryRun) {
     const repoUrl = `https://github.com/${repoInfo.full}`;
     const issueUrl = `${repoUrl}/issues/new?title=${encodeURIComponent(issueContent.title)}&body=${encodeURIComponent(issueContent.body)}`;
-    const { default: open } = await import('open');
+    const { default: open } = await import("open");
     await open(issueUrl);
     console.log(`✓ Opened issue draft in browser`);
   }
