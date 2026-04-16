@@ -9,6 +9,6 @@ export default defineConfig({
   staged: {
     "*": "vp check --fix",
   },
-  fmt: {},
+  fmt: { trailingComma: "all" },
   lint: { options: { typeAware: true, typeCheck: true } },
 });
