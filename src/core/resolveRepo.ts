@@ -1,5 +1,5 @@
-import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 
 export interface RepoInfo {
   owner: string;
@@ -9,9 +9,9 @@ export interface RepoInfo {
 
 function normalizeRepoUrl(url: string): string {
   return url
-    .replace(/^git\+/, '')
-    .replace(/\.git$/, '')
-    .replace(/^git:\/\//, 'https://');
+    .replace(/^git\+/, "")
+    .replace(/\.git$/, "")
+    .replace(/^git:\/\//, "https://");
 }
 
 function extractGitHubRepo(url: string): RepoInfo | null {
@@ -27,7 +27,7 @@ function extractGitHubRepo(url: string): RepoInfo | null {
 
 async function readPackageJson(dir: string): Promise<Record<string, unknown> | null> {
   try {
-    const content = await readFile(join(dir, 'package.json'), 'utf-8');
+    const content = await readFile(join(dir, "package.json"), "utf-8");
     return JSON.parse(content) as Record<string, unknown>;
   } catch {
     return null;
@@ -39,12 +39,12 @@ export async function resolveRepo(
   cwd: string = process.cwd(),
 ): Promise<RepoInfo> {
   // 1. Try local installed package metadata
-  const localPkgDir = join(cwd, 'node_modules', packageName);
+  const localPkgDir = join(cwd, "node_modules", packageName);
   const localPkg = await readPackageJson(localPkgDir);
 
   if (localPkg) {
     const repoUrl =
-      typeof localPkg.repository === 'string'
+      typeof localPkg.repository === "string"
         ? localPkg.repository
         : (localPkg.repository as { url?: string } | undefined)?.url;
 
@@ -53,7 +53,7 @@ export async function resolveRepo(
       if (repoInfo) return repoInfo;
     }
 
-    if (typeof localPkg.homepage === 'string') {
+    if (typeof localPkg.homepage === "string") {
       const repoInfo = extractGitHubRepo(localPkg.homepage);
       if (repoInfo) return repoInfo;
     }
@@ -65,7 +65,7 @@ export async function resolveRepo(
     if (response.ok) {
       const data = (await response.json()) as Record<string, unknown>;
       const repoUrl =
-        typeof data.repository === 'string'
+        typeof data.repository === "string"
           ? data.repository
           : (data.repository as { url?: string } | undefined)?.url;
 

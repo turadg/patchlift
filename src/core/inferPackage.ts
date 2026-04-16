@@ -12,7 +12,7 @@ export interface PackageInfo {
  */
 export function inferPackage(patchFilename: string): PackageInfo {
   // Remove directory path and .patch extension
-  const basename = patchFilename.replace(/.*\//, '').replace(/\.patch$/, '');
+  const basename = patchFilename.replace(/.*\//, "").replace(/\.patch$/, "");
 
   // Match pattern: <name-parts>-npm-<version>-<hash>
   // Version is a semver string like 1.2.3 or 1.2.3-beta.1
@@ -27,7 +27,7 @@ export function inferPackage(patchFilename: string): PackageInfo {
   // Convert scoped package: @scope-pkg → @scope/pkg
   // Yarn replaces '/' with '-' and adds '@' prefix
   let name: string;
-  if (namePart.startsWith('@')) {
+  if (namePart.startsWith("@")) {
     // Already has scope indicator
     name = namePart;
   } else {
@@ -42,11 +42,11 @@ export function inferPackage(patchFilename: string): PackageInfo {
   // The leading @ is preserved but / is replaced with -
   // So @scope-pkg means @scope/pkg
   // We need to re-add the / after the scope
-  if (name.startsWith('@')) {
+  if (name.startsWith("@")) {
     // Find the first - after @ which separates scope from package name
-    const atIdx = name.indexOf('-', 1);
+    const atIdx = name.indexOf("-", 1);
     if (atIdx !== -1) {
-      name = name.slice(0, atIdx) + '/' + name.slice(atIdx + 1);
+      name = name.slice(0, atIdx) + "/" + name.slice(atIdx + 1);
     }
   }
 
