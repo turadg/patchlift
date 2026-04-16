@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { parsePatch } from "../core/parsePatch.js";
-import { inferPackage } from "../core/inferPackage.js";
+import { resolvePackage } from "../core/resolutions.js";
 import { resolveRepo } from "../core/resolveRepo.js";
 import { hashPatch } from "../core/hashPatch.js";
 import { readSidecar, writeSidecar } from "../core/sidecar.js";
@@ -22,7 +22,7 @@ export async function issueCommand(patchFile: string, options: IssueOptions): Pr
 
   const content = await readFile(patchFile, "utf-8");
   const patchInfo = parsePatch(content);
-  const packageInfo = inferPackage(patchFile);
+  const packageInfo = await resolvePackage(patchFile);
   const repoInfo = await resolveRepo(packageInfo.name);
   const patchHash = hashPatch(content);
 

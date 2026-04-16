@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { inferPackage } from "../core/inferPackage.js";
+import { resolvePackage } from "../core/resolutions.js";
 import { resolveRepo } from "../core/resolveRepo.js";
 import { hashPatch } from "../core/hashPatch.js";
 import { readSidecar, writeSidecar } from "../core/sidecar.js";
@@ -22,7 +22,7 @@ export async function updateCommand(patchFile: string, options: UpdateOptions): 
   const now = new Date().toISOString();
 
   if (options.clear) {
-    const pkg = inferPackage(patchFile);
+    const pkg = await resolvePackage(patchFile);
     const repo = await resolveRepo(pkg.name);
 
     const sidecar: SidecarData = {
@@ -47,18 +47,13 @@ export async function updateCommand(patchFile: string, options: UpdateOptions): 
   }
 
   const existing = await readSidecar(patchFile);
+  const pkg = existing?.package ?? (await resolvePackage(patchFile));
   let repo = existing?.upstream?.repo;
 
   if (!repo) {
-    const pkg = inferPackage(patchFile);
     const repoInfo = await resolveRepo(pkg.name);
     repo = repoInfo.full;
   }
-
-  const pkg = (() => {
-    if (existing?.package) return existing.package;
-    return inferPackage(patchFile);
-  })();
 
   const sidecar: SidecarData = {
     schemaVersion: 1,
