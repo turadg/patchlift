@@ -58,6 +58,12 @@ Generates a GitHub issue draft modeled after [patch-package's](https://github.co
 
 Options: `--title <s>`, `--summary <s>`, `--print` (stdout), `--no-web` (skip browser), `--issue <url>` (record a manually-filed URL, usually with `--no-web`), `--dry-run` (don't write the sidecar).
 
+### `patchlift forward <oldPatch> <newPatch>`
+
+Carry sidecar metadata from one patch to another — useful after a dependency version bump regenerates the patch. Preserves upstream URLs, status, notes, and `createdAt`; writes a fresh sidecar for `<newPatch>` with the new package version and patch hash. You're responsible for deleting the old patch afterward — git's rename detection should pair the sidecar add/delete as a move in the resulting commit.
+
+Errors if `<newPatch>` already has a sidecar (delete it first if you really mean to overwrite).
+
 ### `patchlift update <patchFile>`
 
 Mutates the sidecar directly.

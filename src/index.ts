@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { Command, Option } from "commander";
+import { forwardCommand } from "./commands/forward.js";
 import { issueCommand } from "./commands/issue.js";
 import { inspectCommand } from "./commands/inspect.js";
 import { triageCommand } from "./commands/triage.js";
@@ -39,6 +40,18 @@ program
       }
     },
   );
+
+program
+  .command("forward <oldPatch> <newPatch>")
+  .description("Carry sidecar metadata from one patch to another (e.g. after a version bump)")
+  .action(async (oldPatch: string, newPatch: string) => {
+    try {
+      await forwardCommand(oldPatch, newPatch);
+    } catch (err) {
+      console.error(`Error: ${(err as Error).message}`);
+      process.exit(1);
+    }
+  });
 
 program
   .command("inspect [patchFile]")
