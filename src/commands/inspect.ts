@@ -5,6 +5,7 @@ import { inferPackage } from "../core/inferPackage.js";
 import { readSidecar, resolveSidecarStatus } from "../core/sidecar.js";
 import { resolvePatchPath } from "../core/resolvePatchPath.js";
 import { hashPatch } from "../core/hashPatch.js";
+import { detectPatchLayout } from "../core/patchLayout.js";
 import { loadResolutions, buildChainMap } from "../core/resolutions.js";
 import type { ChainEntry } from "../core/resolutions.js";
 
@@ -87,14 +88,15 @@ export async function inspectCommand(
   if (resolvedPatch) {
     patches.push(await inspectPatch(resolvedPatch, chainMap));
   } else {
-    // Scan .yarn/patches
-    const patchDir = join(process.cwd(), ".yarn", "patches");
-    if (!existsSync(patchDir)) {
-      console.log("No .yarn/patches directory found.");
+    const layout = detectPatchLayout();
+    if (!layout || !existsSync(layout.patchDir)) {
+      console.log("No supported patch directory found.");
       return;
     }
-    const files = await readdir(patchDir);
-    const patchFiles = files.filter((f) => f.endsWith(".patch")).map((f) => join(patchDir, f));
+    const files = await readdir(layout.patchDir);
+    const patchFiles = files
+      .filter((f) => f.endsWith(".patch"))
+      .map((f) => join(layout.patchDir, f));
 
     for (const file of patchFiles) {
       patches.push(await inspectPatch(file, chainMap));

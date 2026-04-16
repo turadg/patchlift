@@ -91,7 +91,7 @@ Two terminal statuses sit outside the upstream flow:
 
 ## Sidecar format
 
-Each patch `foo.patch` gets a companion file `foo.patchlift.yml`:
+Each patch `foo.patch` gets a companion file `.patchlift/foo.yml`:
 
 ```yaml
 schemaVersion: 1

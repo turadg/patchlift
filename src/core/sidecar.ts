@@ -1,6 +1,8 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { stringify, parse } from "yaml";
+import { dirname } from "node:path";
+import { sidecarPathForPatchFile } from "./patchLayout.js";
 
 export const STATUSES = [
   "untracked",
@@ -31,7 +33,7 @@ export interface SidecarData {
 }
 
 export function sidecarPath(patchFile: string): string {
-  return patchFile.replace(/\.patch$/, ".patchlift.yml");
+  return sidecarPathForPatchFile(patchFile);
 }
 
 export async function readSidecar(patchFile: string): Promise<SidecarData | null> {
@@ -47,6 +49,7 @@ export async function readSidecar(patchFile: string): Promise<SidecarData | null
 
 export async function writeSidecar(patchFile: string, data: SidecarData): Promise<void> {
   const path = sidecarPath(patchFile);
+  await mkdir(dirname(path), { recursive: true });
   await writeFile(path, stringify(data, { nullStr: "" }), "utf-8");
 }
 

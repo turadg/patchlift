@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vite-plus/test";
-import { writeFile, unlink } from "node:fs/promises";
+import { mkdir, rm, writeFile, unlink } from "node:fs/promises";
 import { readSidecar, writeSidecar, sidecarPath, resolveSidecarStatus } from "../core/sidecar.js";
 import type { SidecarData } from "../core/sidecar.js";
 
@@ -29,10 +29,23 @@ describe("sidecar", () => {
     try {
       await unlink(sidecar);
     } catch {}
+    try {
+      await rm(".patchlift", { recursive: true, force: true });
+    } catch {}
   });
 
-  it("sidecarPath replaces .patch with .patchlift.yml", () => {
-    expect(sidecarPath("foo.patch")).toBe("foo.patchlift.yml");
+  it("sidecarPath stores sidecars in a sibling .patchlift directory", async () => {
+    await mkdir(".yarn/patches", { recursive: true });
+    expect(sidecarPath(".yarn/patches/foo.patch")).toBe(".yarn/patches/.patchlift/foo.yml");
+    expect(sidecarPath("patches/foo.patch")).toBe("patches/.patchlift/foo.yml");
+    expect(sidecarPath("foo.patch")).toBe(".patchlift/foo.yml");
+  });
+
+  it("writeSidecar creates the .patchlift directory", async () => {
+    await writeSidecar(TEST_PATCH, sampleSidecar);
+    const result = await readSidecar(TEST_PATCH);
+    expect(result).toEqual(sampleSidecar);
+    expect(sidecarPath(TEST_PATCH)).toBe(".patchlift/test-patch-sidecar-test.yml");
   });
 
   it("readSidecar returns null when no sidecar exists", async () => {
