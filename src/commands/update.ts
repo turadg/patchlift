@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import { resolvePackage } from "../core/resolutions.js";
 import { resolveRepo } from "../core/resolveRepo.js";
 import { hashPatch } from "../core/hashPatch.js";
-import { readSidecar, writeSidecar } from "../core/sidecar.js";
+import { readSidecar, writeSidecar, sidecarPath } from "../core/sidecar.js";
 import { resolvePatchPath } from "../core/resolvePatchPath.js";
 import type { SidecarData } from "../core/sidecar.js";
 
@@ -27,7 +27,6 @@ export async function updateCommand(patchFile: string, options: UpdateOptions): 
 
     const sidecar: SidecarData = {
       schemaVersion: 1,
-      patchFile,
       patchHash,
       package: pkg,
       upstream: {
@@ -42,7 +41,7 @@ export async function updateCommand(patchFile: string, options: UpdateOptions): 
     };
 
     await writeSidecar(patchFile, sidecar);
-    console.log(`✓ Sidecar cleared: ${patchFile}.patchlift.json`);
+    console.log(`✓ Sidecar cleared: ${sidecarPath(patchFile)}`);
     return;
   }
 
@@ -57,7 +56,6 @@ export async function updateCommand(patchFile: string, options: UpdateOptions): 
 
   const sidecar: SidecarData = {
     schemaVersion: 1,
-    patchFile,
     patchHash,
     package: pkg,
     upstream: {
@@ -77,5 +75,5 @@ export async function updateCommand(patchFile: string, options: UpdateOptions): 
   }
 
   await writeSidecar(patchFile, sidecar);
-  console.log(`✓ Sidecar updated: ${patchFile}.patchlift.json`);
+  console.log(`✓ Sidecar updated: ${sidecarPath(patchFile)}`);
 }

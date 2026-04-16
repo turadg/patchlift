@@ -7,7 +7,6 @@ const TEST_PATCH = "test-patch-sidecar-test.patch";
 
 const sampleSidecar: SidecarData = {
   schemaVersion: 1,
-  patchFile: TEST_PATCH,
   patchHash: "sha256:abc123",
   package: { name: "lodash", version: "4.17.21" },
   upstream: { repo: "lodash/lodash", issue: null, pr: null },
@@ -32,8 +31,8 @@ describe("sidecar", () => {
     } catch {}
   });
 
-  it("sidecarPath appends .patchlift.json", () => {
-    expect(sidecarPath("foo.patch")).toBe("foo.patch.patchlift.json");
+  it("sidecarPath replaces .patch with .patchlift.yml", () => {
+    expect(sidecarPath("foo.patch")).toBe("foo.patchlift.yml");
   });
 
   it("readSidecar returns null when no sidecar exists", async () => {

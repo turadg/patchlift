@@ -91,24 +91,22 @@ Two terminal statuses sit outside the upstream flow:
 
 ## Sidecar format
 
-Each patch gets a companion file `<patch>.patchlift.json`:
+Each patch `foo.patch` gets a companion file `foo.patchlift.yml`:
 
-```json
-{
-  "schemaVersion": 1,
-  "patchFile": ".yarn/patches/lodash-npm-4.17.21-abc123.patch",
-  "patchHash": "sha256:…",
-  "package": { "name": "lodash", "version": "4.17.21" },
-  "upstream": {
-    "repo": "lodash/lodash",
-    "issue": "https://github.com/lodash/lodash/issues/1234",
-    "pr": null
-  },
-  "status": "proposed",
-  "notes": null,
-  "createdAt": "2026-04-15T16:00:00.000Z",
-  "updatedAt": "2026-04-15T16:30:00.000Z"
-}
+```yaml
+schemaVersion: 1
+patchHash: "sha256:…"
+package:
+  name: lodash
+  version: "4.17.21"
+upstream:
+  repo: lodash/lodash
+  issue: https://github.com/lodash/lodash/issues/1234
+  pr: null
+status: proposed
+notes: null
+createdAt: 2026-04-15T16:00:00.000Z
+updatedAt: 2026-04-15T16:30:00.000Z
 ```
 
 Commit these alongside the patch files — they're project state, not local scratch.
