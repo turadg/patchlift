@@ -1,6 +1,6 @@
 {
   "name": "patchlift",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Lift your local Yarn patches upstream",
   "keywords": [],
   "homepage": "https://github.com/turadg/patchlift#readme",
