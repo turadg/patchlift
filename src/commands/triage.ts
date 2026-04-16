@@ -254,6 +254,7 @@ export async function triageCommand(): Promise<void> {
   let updated = 0;
   let skipped = 0;
   let cancelled = false;
+  const failures: Array<{ file: string; message: string }> = [];
 
   try {
     outer: for (let i = 0; i < untracked.length; i++) {
@@ -334,7 +335,7 @@ export async function triageCommand(): Promise<void> {
           await updateCommand(patchFile, updateOpts);
           updated++;
         } catch (err) {
-          p.log.error(`Failed to update ${basename(patchFile)}: ${(err as Error).message}`);
+          failures.push({ file: basename(patchFile), message: (err as Error).message });
         }
         break; // advance to next patch
       }
@@ -343,8 +344,15 @@ export async function triageCommand(): Promise<void> {
     restore();
   }
 
-  const remaining = untracked.length - updated - skipped;
-  const summary = `Updated ${updated}, skipped ${skipped}${remaining > 0 ? `, ${remaining} untouched` : ""}.`;
+  for (const f of failures) {
+    p.log.error(`${f.file}: ${f.message}`);
+  }
+
+  const remaining = untracked.length - updated - skipped - failures.length;
+  const parts = [`Updated ${updated}`, `skipped ${skipped}`];
+  if (failures.length > 0) parts.push(`${failures.length} failed`);
+  if (remaining > 0) parts.push(`${remaining} untouched`);
+  const summary = `${parts.join(", ")}.`;
   if (cancelled) {
     p.cancel(`Triage stopped. ${summary}`);
   } else {

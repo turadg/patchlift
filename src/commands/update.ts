@@ -23,14 +23,19 @@ export async function updateCommand(patchFile: string, options: UpdateOptions): 
 
   if (options.clear) {
     const pkg = await resolvePackage(patchFile);
-    const repo = await resolveRepo(pkg.name);
+    let repo: string | null = null;
+    try {
+      repo = (await resolveRepo(pkg.name)).full;
+    } catch {
+      // Keep null for internal/unresolvable packages.
+    }
 
     const sidecar: SidecarData = {
       schemaVersion: 1,
       patchHash,
       package: pkg,
       upstream: {
-        repo: repo.full,
+        repo,
         issue: null,
         pr: null,
       },
@@ -47,11 +52,16 @@ export async function updateCommand(patchFile: string, options: UpdateOptions): 
 
   const existing = await readSidecar(patchFile);
   const pkg = existing?.package ?? (await resolvePackage(patchFile));
-  let repo = existing?.upstream?.repo;
+  let repo: string | null = existing?.upstream?.repo ?? null;
 
   if (!repo) {
-    const repoInfo = await resolveRepo(pkg.name);
-    repo = repoInfo.full;
+    try {
+      repo = (await resolveRepo(pkg.name)).full;
+    } catch {
+      // Repo isn't always resolvable (internal packages, private registries).
+      // Leave null; issue-creating flows will error with context when needed.
+      repo = null;
+    }
   }
 
   const sidecar: SidecarData = {

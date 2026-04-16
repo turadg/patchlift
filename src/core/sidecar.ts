@@ -22,7 +22,7 @@ export interface SidecarData {
     version: string;
   };
   upstream: {
-    repo: string;
+    repo: string | null;
     issue: string | null;
     pr: string | null;
   };
