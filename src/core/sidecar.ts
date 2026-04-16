@@ -47,7 +47,7 @@ export async function readSidecar(patchFile: string): Promise<SidecarData | null
 
 export async function writeSidecar(patchFile: string, data: SidecarData): Promise<void> {
   const path = sidecarPath(patchFile);
-  await writeFile(path, stringify(data), "utf-8");
+  await writeFile(path, stringify(data, { nullStr: "" }), "utf-8");
 }
 
 export function resolveSidecarStatus(sidecar: SidecarData | null): SidecarData["status"] {
